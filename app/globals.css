@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
+/* ─── Verso DS — Semantic tokens (Light mode) ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background */
+  --bg-default:      #fefdfc;
+  --bg-secondary:    #f6f2ee;
+  --bg-strong:       #d7d3ce;
+  --bg-subtle:       #eae9fe;
+  --bg-accent-01:    #6237f0;
+  --bg-accent-02:    #ef4444;
+  --bg-accent-03:    #120d07;
+  --bg-disabled:     #e4e4e7;
+  --bg-error:        #fef2f2;
+  --bg-warning:      #fefce8;
+  --bg-success:      #f4fce9;
+
+  /* Foreground (text) */
+  --fg-default:      #120d07;
+  --fg-secondary:    #585551;
+  --fg-tertiary:     #837e79;
+  --fg-accent-01:    #fefdfc;
+  --fg-accent-02:    #6237f0;
+  --fg-disabled:     #a1a1aa;
+  --fg-error:        #dc2626;
+  --fg-warning:      #eab308;
+  --fg-success:      #58941c;
+
+  /* Border */
+  --border-default:  #d7d3ce;
+  --border-secondary:#ebe7e2;
+  --border-strong:   #c4bfba;
+  --border-accent:   #5e32de;
+  --border-disabled: #d4d4d8;
+  --border-error:    #dc2626;
+  --border-warning:  #eab308;
+  --border-success:  #58941c;
+
+  /* Active states */
+  --active-bg-default:    #f6f2ee;
+  --active-bg-secondary:  #ebe7e2;
+  --active-bg-accent-01:  #451fb8;
+  --active-bg-accent-02:  #dc2626;
+  --active-bg-accent-03:  #2e2b29;
+
+  /* Highlight (Empathy Map quadrants) */
+  --hl-white:    #ffffff;
+  --hl-purple:   #b9b4fe;  /* Thinks */
+  --hl-pink:     #f9a8d4;  /* Feels  */
+  --hl-green:    #d0f0a6;  /* Says   */
+  --hl-blue:     #b7e9ff;  /* Does   */
+  --hl-red:      #fca5a5;  /* Pains  */
+  --hl-cyan:     #a5f3fc;  /* Gains  */
+  --hl-yellow:   #fef08a;
+  --hl-orange:   #fed7aa;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--bg-default);
+  --color-foreground: var(--fg-default);
+  --color-accent:     var(--bg-accent-01);
+  --font-sans:        var(--font-inter);
+  --font-serif:       var(--font-pt-serif);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-default);
+  color: var(--fg-default);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Card ─── */
+.card {
+  background: var(--bg-default);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+}
+
+/* ─── CTA button ─── */
+.btn-primary {
+  background: var(--bg-accent-01);
+  color: var(--fg-accent-01);
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--active-bg-accent-01);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
