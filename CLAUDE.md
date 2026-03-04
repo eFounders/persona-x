@@ -6,9 +6,18 @@
 
 ## Contexte
 
-PersonaX est un SaaS qui prend des notes d'interviews utilisateurs brutes et génère automatiquement des **Empathy Maps**, des **Behavioral Personas** et des **Jobs To Be Done (JTBD)**. L'utilisateur colle ses notes ou uploade un fichier `.txt`/`.md`, l'IA Claude analyse et structure les insights.
+PersonaX est un SaaS qui prend des transcripts d'interviews utilisateurs en PDF et génère automatiquement des **Behavioral Archetypes** (avec Empathy Map intégrée par archetype) et des **Jobs To Be Done (JTBD)**. 100% comportemental, zéro démographique, tout ancré dans des verbatims réels.
 
 Projet d'apprentissage : Claude Code + MCPs.
+
+---
+
+## Déploiement
+
+- **Local** : `/Users/nellyseiglan/persona-x`
+- **GitHub** : `git@github.com:eFounders/persona-x.git` (org eFounders)
+- **Vercel** : team `hexa-hq` → alias `https://persona-x-hexa-hq.vercel.app`
+- **Déployer** : `npx vercel --scope hexa-hq --prod` depuis `/Users/nellyseiglan/persona-x`
 
 ---
 
@@ -22,6 +31,8 @@ Projet d'apprentissage : Claude Code + MCPs.
 | Tailwind CSS      | v4       | `@import "tailwindcss"`, `@theme inline` |
 | @anthropic-ai/sdk | latest   | Server-side uniquement, jamais client    |
 | lucide-react      | latest   | Icônes                                   |
+| pdf-parse         | ^1.1.4   | Parsing PDF server-side (v1, pas v2)     |
+| fflate            | latest   | Compression pour liens partageables      |
 
 Path alias : `@/*` → racine du projet
 
@@ -33,19 +44,49 @@ Path alias : `@/*` → racine du projet
 app/
 ├── globals.css              Design tokens CSS (Verso DS)
 ├── layout.tsx               Metadata + polices (PT Serif + Inter)
-├── page.tsx                 Shell state machine (input ↔ results)
-└── api/analyze/route.ts     POST → Claude (server-only)
+├── page.tsx                 Shell state machine (input | results | history)
+├── share/page.tsx           Page lien partageable — décode hash URL
+└── api/analyze/route.ts     POST multipart/form-data → Claude (server-only)
 
 types/persona.ts             Toutes les interfaces TypeScript
 lib/prompt.ts                System prompt + analyzeNotes() — SERVER ONLY
+lib/useHistory.ts            Hook localStorage — historique des analyses
+lib/share.ts                 encode/decode résultats pour URL partageable
 
 components/
-├── InputPanel.tsx           "use client" — textarea + upload + submit
-├── ResultsPanel.tsx         "use client" — tabs switcher
-├── EmpathyMapCard.tsx       Server Component — grille empathy
-├── PersonaCard.tsx          Server Component — carte persona
-├── JtbdCard.tsx             Server Component — carte JTBD
-└── LoadingSpinner.tsx       Server Component — spinner SVG
+├── InputPanel.tsx           "use client" — upload PDF + bouton Historique
+├── ResultsPanel.tsx         "use client" — tabs + bouton Partager
+├── PersonaCard.tsx          ArchetypeCard — label, verbatims, empathy map
+├── EmpathyMapCard.tsx       Grille 6 quadrants avec tokens hl-*
+├── JtbdCard.tsx             JTBD + chips archetypes + count interviewés
+├── HistoryPanel.tsx         Liste historique localStorage
+└── LoadingSpinner.tsx       Spinner SVG
+```
+
+---
+
+## Schéma de données (AnalysisResult)
+
+```typescript
+interface AnalysisResult {
+  archetypes: Archetype[];   // 2-4 archetypes comportementaux
+  jtbds: Jtbd[];             // 3-8 jobs to be done
+}
+
+interface Archetype {
+  label: string;                  // ex: "L'Administratif Débordé"
+  behavioral_description: string;
+  tech_relationship: string;
+  main_frustration: string;
+  verbatims: string[];            // 2-3 citations directes
+  empathy_map: EmpathyMap;        // une carte par archetype
+}
+
+interface Jtbd {
+  when, i_want_to, so_that, context: string;
+  archetypes: string[];           // labels exacts des archetypes
+  interviewee_count: number;
+}
 ```
 
 ---
@@ -55,13 +96,12 @@ components/
 ### TypeScript
 - **Strict mode activé** — pas de `any`, pas de `as unknown`, pas d'assertions de type non justifiées
 - Toutes les interfaces sont dans `types/persona.ts`
-- Les props de composants sont typées inline ou avec `interface`
 
 ### Server vs Client Components
-- **Server Components par défaut** — ne jamais ajouter `"use client"` sans raison
-- `"use client"` uniquement si le composant utilise : `useState`, `useEffect`, `useRef`, événements navigateur
-- **Règle critique** : `lib/prompt.ts` et `@anthropic-ai/sdk` sont **server-only**. Ne jamais les importer dans un Client Component — cela exposerait la clé API dans le bundle navigateur
-- La communication Client → Serveur se fait exclusivement via `fetch("/api/analyze")`
+- **Server Components par défaut**
+- `"use client"` uniquement si : `useState`, `useEffect`, `useRef`, événements navigateur
+- **Règle critique** : `lib/prompt.ts` et `@anthropic-ai/sdk` sont **server-only**
+- Communication Client → Serveur exclusivement via `fetch("/api/analyze")`
 
 ---
 
@@ -146,15 +186,12 @@ Définis dans `app/globals.css` sous `:root`. Toujours utiliser ces tokens, jama
 
 | Token CSS        | Valeur    | Usage PersonaX    |
 |------------------|-----------|-------------------|
-| `--hl-white`     | `#ffffff` |                   |
 | `--hl-purple`    | `#b9b4fe` | Thinks            |
 | `--hl-pink`      | `#f9a8d4` | Feels             |
 | `--hl-green`     | `#d0f0a6` | Says              |
 | `--hl-blue`      | `#b7e9ff` | Does              |
 | `--hl-red`       | `#fca5a5` | Pains             |
 | `--hl-cyan`      | `#a5f3fc` | Gains             |
-| `--hl-yellow`    | `#fef08a` |                   |
-| `--hl-orange`    | `#fed7aa` |                   |
 
 ---
 
@@ -190,9 +227,9 @@ background: var(--active-bg-accent-01);  /* #451fb8 */
 ## Modèle Claude
 
 - **Modèle** : `claude-sonnet-4-6`
-- **max_tokens** : `2048`
-- **Appel unique** : une seule requête retourne les 3 outputs en JSON
-- **Clé API** : `ANTHROPIC_API_KEY` dans `.env.local` (jamais commitée)
+- **max_tokens** : `8192`
+- **Appel unique** : une seule requête retourne archetypes + jtbds en JSON
+- **Clé API** : `ANTHROPIC_API_KEY` dans `.env.local` (jamais commitée) et dans Vercel env
 
 ---
 
@@ -200,12 +237,12 @@ background: var(--active-bg-accent-01);  /* #451fb8 */
 
 ```
 POST /api/analyze
-Content-Type: application/json
-Body: { "notes": "string" }
+Content-Type: multipart/form-data
+Body: FormData avec champ "pdfs" (un ou plusieurs fichiers PDF)
 
 Réponses :
 → 200 { result: AnalysisResult }
-→ 400 { error: "..." }  — notes trop courtes (<50) ou trop longues (>20 000 chars)
+→ 400 { error: "..." }  — aucun PDF, texte vide ou trop court (<50 chars)
 → 500 { error: "..." }  — erreur Claude ou parse JSON
 ```
 
@@ -217,4 +254,5 @@ Réponses :
 npm run dev    # Développement sur localhost:3000
 npm run build  # Build production
 npm run lint   # ESLint
+npx vercel --scope hexa-hq --prod  # Deploy production
 ```
