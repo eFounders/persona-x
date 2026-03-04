@@ -1,48 +1,54 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { AnalysisResult } from "@/types/persona";
 
-const SYSTEM_PROMPT = `You are a UX research analyst. You receive raw user interview notes and output structured UX artefacts in JSON. You MUST respond with ONLY valid JSON — no markdown code fences, no explanatory text, no comments. The JSON must exactly match the schema below.
+const SYSTEM_PROMPT = `You are a senior UX researcher specializing in behavioral analysis. You receive raw user interview transcripts and extract structured UX artefacts in JSON. You MUST respond with ONLY valid JSON — no markdown code fences, no explanatory text, no comments.
+
+ABSOLUTE RULES:
+- ZERO demographic information: no age, no exact job title, no name, no gender
+- 100% behavioral: every insight describes what people DO, THINK, or FEEL — not who they are
+- Every insight must be anchored in a real verbatim from the corpus
+- Verbatims must be quoted exactly as spoken, between double quotes
+- Never invent or paraphrase quotes — only use actual words from the transcripts
+- Never use real names of interviewees
 
 SCHEMA:
 {
-  "empathy_map": {
-    "thinks": ["string"],
-    "feels":  ["string"],
-    "says":   ["string"],
-    "does":   ["string"],
-    "pains":  ["string"],
-    "gains":  ["string"]
-  },
-  "personas": [
+  "archetypes": [
     {
-      "name":          "string",
-      "role":          "string",
-      "age":           number,
-      "bio":           "string",
-      "goals":         ["string"],
-      "frustrations":  ["string"],
-      "behaviors":     ["string"],
-      "quote":         "string"
+      "label": "string — a descriptive French label (e.g. 'L'Administratif Débordé', 'Le Stratège Autonome')",
+      "behavioral_description": "string — 2-3 sentences describing behavioral patterns common to multiple interviewees, not a demographic portrait",
+      "tech_relationship": "string — 1-2 sentences on how this archetype relates to and uses technology",
+      "main_frustration": "string — the core recurring frustration, grounded in verbatims",
+      "verbatims": ["string — exact quote from transcript", "string — exact quote from transcript"],
+      "empathy_map": {
+        "thinks": ["\"exact verbatim quote\""],
+        "feels": ["\"exact verbatim quote\""],
+        "says": ["\"exact verbatim quote\""],
+        "does": ["\"exact verbatim quote\""],
+        "pains": ["\"exact verbatim quote\""],
+        "gains": ["\"exact verbatim quote\""]
+      }
     }
   ],
   "jtbds": [
     {
-      "when":       "string",
-      "i_want_to":  "string",
-      "so_that":    "string",
-      "context":    "string"
+      "when": "string — behavioral trigger situation",
+      "i_want_to": "string — the functional job",
+      "so_that": "string — the deeper outcome",
+      "context": "string — additional behavioral context",
+      "archetypes": ["label of archetype 1", "label of archetype 2"],
+      "interviewee_count": number
     }
   ]
 }
 
 RULES:
-- personas: identify 1 to 3 distinct user archetypes from the notes. Each array item is one persona. Do not merge distinct archetypes.
-- jtbds: extract 3 to 6 distinct jobs-to-be-done.
-- Each array field (thinks, goals, etc.) should have 3 to 6 items.
-- All strings must be concise: 1 sentence or short phrase, not paragraphs.
-- bio must be 2-3 sentences maximum.
-- quote must be a direct or representative verbatim-style quote from the user.
-- If the notes are too short or ambiguous, make reasonable inferences grounded in the text.
+- archetypes: identify 2 to 3 behavioral archetypes based on PATTERNS shared across multiple interviewees — never a portrait of a single person
+- Each archetype label must be in French and evocative (article + noun + adjective)
+- empathy_map per archetype: each quadrant must contain 3-5 real verbatim quotes between double quotes — not paraphrases
+- verbatims array: 2-3 striking direct quotes per archetype
+- jtbds: extract 3 to 6 jobs-to-be-done, each linked to one or more archetypes by their exact label
+- interviewee_count: best estimate of how many interviewees in the corpus share this job
 - Return ONLY the JSON object. Nothing else.`;
 
 const client = new Anthropic();
@@ -55,7 +61,7 @@ export async function analyzeNotes(notes: string): Promise<AnalysisResult> {
     messages: [
       {
         role: "user",
-        content: `Here are the user interview notes:\n\n<notes>\n${notes}\n</notes>\n\nAnalyse these notes and return the JSON object.`,
+        content: `Here are the user interview transcripts:\n\n<transcripts>\n${notes}\n</transcripts>\n\nAnalyse these transcripts and return the JSON object.`,
       },
     ],
   });
@@ -81,7 +87,7 @@ export async function analyzeNotes(notes: string): Promise<AnalysisResult> {
   }
 
   const result = parsed as Record<string, unknown>;
-  if (!result.empathy_map || !result.personas || !result.jtbds) {
+  if (!result.archetypes || !result.jtbds) {
     throw new Error("Claude response is missing required keys");
   }
 

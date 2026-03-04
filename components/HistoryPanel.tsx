@@ -103,7 +103,7 @@ export default function HistoryPanel({ entries, onLoad, onDelete, onBack }: Hist
                   ))}
                 </div>
                 <p className="text-xs mt-2" style={{ color: "var(--fg-tertiary)" }}>
-                  {entry.result.personas.length} persona{entry.result.personas.length > 1 ? "s" : ""} · {entry.result.jtbds.length} JTBD
+                  {entry.result.archetypes.length} archétype{entry.result.archetypes.length > 1 ? "s" : ""} · {entry.result.jtbds.length} JTBD
                 </p>
               </div>
 

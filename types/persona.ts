@@ -7,15 +7,13 @@ export interface EmpathyMap {
   gains: string[];
 }
 
-export interface Persona {
-  name: string;
-  role: string;
-  age: number;
-  bio: string;
-  goals: string[];
-  frustrations: string[];
-  behaviors: string[];
-  quote: string;
+export interface Archetype {
+  label: string;
+  behavioral_description: string;
+  tech_relationship: string;
+  main_frustration: string;
+  verbatims: string[];
+  empathy_map: EmpathyMap;
 }
 
 export interface Jtbd {
@@ -23,16 +21,17 @@ export interface Jtbd {
   i_want_to: string;
   so_that: string;
   context: string;
+  archetypes: string[];
+  interviewee_count: number;
 }
 
 export interface AnalysisResult {
-  empathy_map: EmpathyMap;
-  personas: Persona[];
+  archetypes: Archetype[];
   jtbds: Jtbd[];
 }
 
 export type AppView = "input" | "results" | "history";
-export type ResultsTab = "empathy" | "personas" | "jtbd";
+export type ResultsTab = "archetypes" | "empathy" | "jtbd";
 
 export interface HistoryEntry {
   id: string;
