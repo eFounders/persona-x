@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeNotes } from "@/lib/prompt";
 
-// pdf-parse v2 exports a class, not a function
+// Use pdf-parse v1 core directly to avoid test-file loading issues in serverless
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PDFParse } = require("pdf-parse") as {
-  PDFParse: new (opts: { data: Buffer }) => { getText(): Promise<{ text: string }> };
-};
+const pdfParse = require("pdf-parse/lib/pdf-parse.js") as (
+  buffer: Buffer
+) => Promise<{ text: string }>;
 
 const MAX_CHARS = 20_000;
 
@@ -27,8 +27,7 @@ export async function POST(req: NextRequest) {
       if (!(entry instanceof File)) continue;
 
       const buffer = Buffer.from(await entry.arrayBuffer());
-      const parser = new PDFParse({ data: buffer });
-      const parsed = await parser.getText();
+      const parsed = await pdfParse(buffer);
       const text = parsed.text.trim();
 
       if (text.length > 0) {
