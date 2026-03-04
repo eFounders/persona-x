@@ -1,42 +1,79 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Share2, Check, ExternalLink } from "lucide-react";
 import { AnalysisResult, ResultsTab } from "@/types/persona";
+import { encodeResult } from "@/lib/share";
 import ArchetypeCard from "./PersonaCard";
 import JtbdCard from "./JtbdCard";
 
 interface ResultsPanelProps {
   result: AnalysisResult;
   onReset: () => void;
+  shareMode?: boolean;
 }
 
 const TABS: { id: ResultsTab; label: string; count?: (r: AnalysisResult) => number }[] = [
-  { id: "archetypes", label: "Archetypes",     count: (r) => r.archetypes.length },
-  { id: "jtbd",       label: "Jobs To Be Done", count: (r) => r.jtbds.length },
+  { id: "archetypes", label: "Archetypes",      count: (r) => r.archetypes.length },
+  { id: "jtbd",       label: "Jobs To Be Done",  count: (r) => r.jtbds.length },
 ];
 
-export default function ResultsPanel({ result, onReset }: ResultsPanelProps) {
+export default function ResultsPanel({ result, onReset, shareMode = false }: ResultsPanelProps) {
   const [activeTab, setActiveTab] = useState<ResultsTab>("archetypes");
+  const [copied, setCopied] = useState(false);
+
+  function handleShare() {
+    const encoded = encodeResult(result);
+    const url = `${window.location.origin}/share#${encoded}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <button
-          onClick={onReset}
-          className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
-          style={{ color: "var(--fg-secondary)" }}
-        >
-          <ArrowLeft size={16} />
-          Nouvelle analyse
-        </button>
+        {shareMode ? (
+          <a
+            href="/"
+            className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
+            style={{ color: "var(--fg-secondary)" }}
+          >
+            <ExternalLink size={16} />
+            Faire ma propre analyse
+          </a>
+        ) : (
+          <button
+            onClick={onReset}
+            className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
+            style={{ color: "var(--fg-secondary)" }}
+          >
+            <ArrowLeft size={16} />
+            Nouvelle analyse
+          </button>
+        )}
+
         <h1
           className="text-2xl font-black tracking-tight"
           style={{ color: "var(--fg-default)", fontFamily: "var(--font-pt-serif), Georgia, serif" }}
         >
           PersonaX
         </h1>
+
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+          style={{
+            color: copied ? "var(--fg-success)" : "var(--fg-secondary)",
+            border: `1px solid ${copied ? "var(--border-success)" : "var(--border-default)"}`,
+            background: copied ? "var(--bg-success)" : "var(--bg-secondary)",
+          }}
+        >
+          {copied ? <Check size={14} /> : <Share2 size={14} />}
+          {copied ? "Lien copié !" : "Partager"}
+        </button>
       </div>
 
       {/* Tab nav */}
@@ -61,9 +98,7 @@ export default function ResultsPanel({ result, onReset }: ResultsPanelProps) {
             >
               {tab.label}
               {count !== undefined && (
-                <span className="ml-1.5 text-xs font-bold">
-                  ({count})
-                </span>
+                <span className="ml-1.5 text-xs font-bold">({count})</span>
               )}
             </button>
           );
