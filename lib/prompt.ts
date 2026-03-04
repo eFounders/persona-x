@@ -50,7 +50,7 @@ const client = new Anthropic();
 export async function analyzeNotes(notes: string): Promise<AnalysisResult> {
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 2048,
+    max_tokens: 8096,
     system: SYSTEM_PROMPT,
     messages: [
       {
