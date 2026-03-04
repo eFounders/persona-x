@@ -6,10 +6,26 @@ import { HistoryEntry, AnalysisResult } from "@/types/persona";
 const STORAGE_KEY = "personax_history";
 const MAX_ENTRIES = 10;
 
+function isValidEntry(e: unknown): e is HistoryEntry {
+  if (!e || typeof e !== "object") return false;
+  const entry = e as Record<string, unknown>;
+  const result = entry.result as Record<string, unknown> | undefined;
+  return (
+    typeof entry.id === "string" &&
+    typeof entry.date === "string" &&
+    Array.isArray(entry.fileNames) &&
+    result != null &&
+    Array.isArray(result.archetypes) &&
+    Array.isArray(result.jtbds)
+  );
+}
+
 function loadFromStorage(): HistoryEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as HistoryEntry[]) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown[];
+    return Array.isArray(parsed) ? parsed.filter(isValidEntry) : [];
   } catch {
     return [];
   }
