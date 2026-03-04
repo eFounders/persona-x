@@ -31,5 +31,12 @@ export interface AnalysisResult {
   jtbds: Jtbd[];
 }
 
-export type AppView = "input" | "results";
+export type AppView = "input" | "results" | "history";
 export type ResultsTab = "empathy" | "personas" | "jtbd";
+
+export interface HistoryEntry {
+  id: string;
+  date: string; // ISO 8601
+  fileNames: string[];
+  result: AnalysisResult;
+}

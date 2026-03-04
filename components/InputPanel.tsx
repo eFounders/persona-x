@@ -7,12 +7,14 @@ import {
   DragEvent,
   ChangeEvent,
 } from "react";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, Clock } from "lucide-react";
 import LoadingSpinner from "./LoadingSpinner";
 
 interface InputPanelProps {
   onSubmit: (files: File[]) => void;
   isLoading: boolean;
+  historyCount: number;
+  onShowHistory: () => void;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -23,7 +25,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
 }
 
-export default function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
+export default function InputPanel({ onSubmit, isLoading, historyCount, onShowHistory }: InputPanelProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [sizeError, setSizeError] = useState<string | null>(null);
@@ -84,12 +86,36 @@ export default function InputPanel({ onSubmit, isLoading }: InputPanelProps) {
     <div className="mx-auto max-w-2xl px-4 py-16">
       {/* Header */}
       <div className="mb-10">
-        <h1
-          className="mb-3 text-6xl font-black tracking-tight"
-          style={{ color: "var(--fg-default)", fontFamily: "var(--font-pt-serif), Georgia, serif" }}
-        >
-          PersonaX
-        </h1>
+        <div className="flex items-start justify-between mb-3">
+          <h1
+            className="text-6xl font-black tracking-tight"
+            style={{ color: "var(--fg-default)", fontFamily: "var(--font-pt-serif), Georgia, serif" }}
+          >
+            PersonaX
+          </h1>
+          <button
+            onClick={onShowHistory}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors mt-2"
+            style={{
+              color: "var(--fg-secondary)",
+              border: "1px solid var(--border-default)",
+              background: "var(--bg-secondary)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--active-bg-default)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--bg-secondary)")}
+          >
+            <Clock size={14} />
+            Historique
+            {historyCount > 0 && (
+              <span
+                className="rounded-full px-1.5 py-0.5 text-xs font-bold"
+                style={{ background: "var(--bg-accent-01)", color: "var(--fg-accent-01)" }}
+              >
+                {historyCount}
+              </span>
+            )}
+          </button>
+        </div>
         <p className="text-lg" style={{ color: "var(--fg-tertiary)" }}>
           Upload tes transcripts d&apos;interviews en PDF. Obtiens des Empathy
           Maps, Personas et Jobs To Be Done en quelques secondes.
