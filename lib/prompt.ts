@@ -42,13 +42,20 @@ SCHEMA:
   ]
 }
 
+ANALYSIS PROCESS — follow these steps before producing JSON:
+1. Read ALL transcripts exhaustively. Identify each distinct interviewee.
+2. For each interviewee, extract their dominant behavioral signals, verbatims, frustrations, and goals.
+3. Cluster interviewees by SHARED behavioral patterns — not by role or demographics.
+4. Define 2 to 4 archetypes from these clusters. EVERY interviewee must belong to at least one archetype.
+5. Pull verbatims directly from the transcripts to populate each field.
+
 RULES:
-- archetypes: identify 2 to 3 behavioral archetypes based on PATTERNS shared across multiple interviewees — never a portrait of a single person
+- archetypes: 2 to 4 behavioral archetypes. Every interviewee must be represented in at least one archetype. Archetypes are defined by cross-cutting behavioral patterns, not individual portraits.
 - Each archetype label must be in French and evocative (article + noun + adjective)
 - empathy_map per archetype: each quadrant must contain 3-5 real verbatim quotes between double quotes — not paraphrases
 - verbatims array: 2-3 striking direct quotes per archetype
-- jtbds: extract 3 to 6 jobs-to-be-done, each linked to one or more archetypes by their exact label
-- interviewee_count: best estimate of how many interviewees in the corpus share this job
+- jtbds: extract 3 to 8 jobs-to-be-done, each linked to one or more archetypes by their exact label
+- interviewee_count: exact count of interviewees in the corpus who share this job
 - Return ONLY the JSON object. Nothing else.`;
 
 const client = new Anthropic();
@@ -56,7 +63,7 @@ const client = new Anthropic();
 export async function analyzeNotes(notes: string): Promise<AnalysisResult> {
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 8096,
+    max_tokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [
       {
