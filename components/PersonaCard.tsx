@@ -8,7 +8,7 @@ interface ArchetypeCardProps {
 
 export default function ArchetypeCard({ archetype }: ArchetypeCardProps) {
   const initials = archetype.label
-    .replace(/^L[ae']?\s*/i, "")
+    .replace(/^Les?\s+|^L[ae']?\s*/i, "")
     .split(" ")
     .map((w) => w[0])
     .join("")
@@ -57,6 +57,24 @@ export default function ArchetypeCard({ archetype }: ArchetypeCardProps) {
           </p>
         </div>
       </div>
+
+      {/* Verbatims */}
+      {archetype.verbatims && archetype.verbatims.length > 0 && (
+        <div
+          className="px-6 py-4 space-y-2"
+          style={{ borderBottom: "1px solid var(--border-default)" }}
+        >
+          {archetype.verbatims.map((v, i) => (
+            <p
+              key={i}
+              className="text-sm italic"
+              style={{ color: "var(--fg-secondary)" }}
+            >
+              {v}
+            </p>
+          ))}
+        </div>
+      )}
 
       {/* Empathy Persona */}
       {archetype.empathy_persona && (

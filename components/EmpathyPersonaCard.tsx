@@ -206,25 +206,24 @@ export default function EmpathyPersonaCard({ data }: EmpathyPersonaCardProps) {
       {/* Opportunités produit */}
       <div>
         <span style={{ ...LABEL_STYLE, marginBottom: 10 }}>Opportunités produit</span>
-        <div className="flex flex-wrap gap-2">
+        <ul className="space-y-1.5">
           {data.opportunites_produit.map((opp, i) => (
-            <span
-              key={i}
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: 13,
-                color: "var(--bg-accent-01)",
-                background: "color-mix(in srgb, var(--bg-accent-01) 10%, transparent)",
-                border: "1px solid var(--bg-accent-01)",
-                borderRadius: 20,
-                padding: "6px 14px",
-                lineHeight: 1.5,
-              }}
-            >
+            <li key={i} className="flex items-start gap-2" style={BODY_STYLE}>
+              <span
+                style={{
+                  marginTop: 6,
+                  width: 5,
+                  height: 5,
+                  borderRadius: "50%",
+                  background: "var(--bg-accent-01)",
+                  flexShrink: 0,
+                  display: "inline-block",
+                }}
+              />
               {opp}
-            </span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
     </div>
