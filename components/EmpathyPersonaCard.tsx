@@ -48,7 +48,7 @@ export default function EmpathyPersonaCard({ data }: EmpathyPersonaCardProps) {
         </p>
       </div>
 
-      {/* Préférences | Alternatives */}
+      {/* Critères de choix | Alternatives actuelles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div
           style={{
@@ -60,7 +60,7 @@ export default function EmpathyPersonaCard({ data }: EmpathyPersonaCardProps) {
         >
           <span style={LABEL_STYLE}>Critères de choix</span>
           <ul className="space-y-1.5">
-            {data.preferences.map((pref, i) => (
+            {data.criteres_de_choix.map((pref, i) => (
               <li key={i} className="flex items-start gap-2" style={BODY_STYLE}>
                 <span
                   style={{
@@ -89,7 +89,7 @@ export default function EmpathyPersonaCard({ data }: EmpathyPersonaCardProps) {
         >
           <span style={LABEL_STYLE}>Alternatives actuelles</span>
           <ul className="space-y-1.5">
-            {data.alternatives.map((alt, i) => (
+            {data.alternatives_actuelles.map((alt, i) => (
               <li key={i} className="flex items-start gap-2" style={BODY_STYLE}>
                 <span
                   style={{
@@ -200,14 +200,14 @@ export default function EmpathyPersonaCard({ data }: EmpathyPersonaCardProps) {
         }}
       >
         <span style={LABEL_STYLE}>Contexte & moments clés</span>
-        <p style={BODY_STYLE}>{data.context}</p>
+        <p style={BODY_STYLE}>{data.contexte}</p>
       </div>
 
-      {/* HMW */}
+      {/* Opportunités produit */}
       <div>
-        <span style={{ ...LABEL_STYLE, marginBottom: 10 }}>How Might We</span>
+        <span style={{ ...LABEL_STYLE, marginBottom: 10 }}>Opportunités produit</span>
         <div className="flex flex-wrap gap-2">
-          {data.hmw.map((question, i) => (
+          {data.opportunites_produit.map((opp, i) => (
             <span
               key={i}
               style={{
@@ -221,7 +221,7 @@ export default function EmpathyPersonaCard({ data }: EmpathyPersonaCardProps) {
                 lineHeight: 1.5,
               }}
             >
-              {question}
+              {opp}
             </span>
           ))}
         </div>

@@ -5,12 +5,12 @@ export interface EmotionEntry {
 
 export interface EmpathyPersona {
   jtbd: string;
-  preferences: string[];
+  criteres_de_choix: string[];
   emotions_positive: EmotionEntry[];
   emotions_negative: EmotionEntry[];
-  context: string;
-  alternatives: string[];
-  hmw: string[];
+  contexte: string;
+  alternatives_actuelles: string[];
+  opportunites_produit: string[];
 }
 
 export interface Archetype {
