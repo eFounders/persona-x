@@ -1,10 +1,16 @@
-export interface EmpathyMap {
-  thinks: string[];
-  feels: string[];
-  says: string[];
-  does: string[];
-  pains: string[];
-  gains: string[];
+export interface EmotionEntry {
+  emotion: string;
+  verbatim: string;
+}
+
+export interface EmpathyPersona {
+  jtbd: string;
+  preferences: string[];
+  emotions_positive: EmotionEntry[];
+  emotions_negative: EmotionEntry[];
+  context: string;
+  alternatives: string[];
+  hmw: string[];
 }
 
 export interface Archetype {
@@ -13,7 +19,7 @@ export interface Archetype {
   tech_relationship: string;
   main_frustration: string;
   verbatims: string[];
-  empathy_map: EmpathyMap;
+  empathy_persona: EmpathyPersona;
 }
 
 export interface Jtbd {
@@ -31,7 +37,7 @@ export interface AnalysisResult {
 }
 
 export type AppView = "input" | "results" | "history";
-export type ResultsTab = "archetypes" | "empathy" | "jtbd";
+export type ResultsTab = "archetypes" | "jtbd";
 
 export interface HistoryEntry {
   id: string;

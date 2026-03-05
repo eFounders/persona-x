@@ -10,14 +10,18 @@ function isValidEntry(e: unknown): e is HistoryEntry {
   if (!e || typeof e !== "object") return false;
   const entry = e as Record<string, unknown>;
   const result = entry.result as Record<string, unknown> | undefined;
-  return (
-    typeof entry.id === "string" &&
-    typeof entry.date === "string" &&
-    Array.isArray(entry.fileNames) &&
-    result != null &&
-    Array.isArray(result.archetypes) &&
-    Array.isArray(result.jtbds)
-  );
+  if (
+    typeof entry.id !== "string" ||
+    typeof entry.date !== "string" ||
+    !Array.isArray(entry.fileNames) ||
+    result == null ||
+    !Array.isArray(result.archetypes) ||
+    !Array.isArray(result.jtbds)
+  ) return false;
+  // Reject old entries that use empathy_map instead of empathy_persona
+  const archetypes = result.archetypes as Record<string, unknown>[];
+  if (archetypes.length > 0 && "empathy_map" in archetypes[0]) return false;
+  return true;
 }
 
 function loadFromStorage(): HistoryEntry[] {

@@ -20,13 +20,27 @@ SCHEMA:
       "tech_relationship": "string — 1-2 sentences on how this archetype relates to and uses technology",
       "main_frustration": "string — the core recurring frustration, grounded in verbatims",
       "verbatims": ["string — exact quote from transcript", "string — exact quote from transcript"],
-      "empathy_map": {
-        "thinks": ["\"exact verbatim quote\""],
-        "feels": ["\"exact verbatim quote\""],
-        "says": ["\"exact verbatim quote\""],
-        "does": ["\"exact verbatim quote\""],
-        "pains": ["\"exact verbatim quote\""],
-        "gains": ["\"exact verbatim quote\""]
+      "empathy_persona": {
+        "jtbd": "string — one sentence in the format 'Quand [situation], je veux [action], pour [outcome]' — never mention the product being analysed by name",
+        "preferences": [
+          "string — a selection criterion from the user's point of view (e.g. 'rapidité de setup', 'pas de courbe d'apprentissage')",
+          "string",
+          "string"
+        ],
+        "emotions_positive": [
+          { "emotion": "string — positive emotion label", "verbatim": "\"exact quote from transcript\"" },
+          { "emotion": "string", "verbatim": "\"exact quote\"" }
+        ],
+        "emotions_negative": [
+          { "emotion": "string — negative emotion or frustration label", "verbatim": "\"exact quote from transcript\"" },
+          { "emotion": "string", "verbatim": "\"exact quote\"" }
+        ],
+        "context": "string — the usage environment and key trigger moments: tools used, situations that trigger the need, concrete examples from the interviews",
+        "alternatives": ["string — what they currently use instead", "string"],
+        "hmw": [
+          "string — How Might We question 1, oriented towards a product opportunity derived from this archetype",
+          "string — How Might We question 2"
+        ]
       }
     }
   ],
@@ -52,7 +66,12 @@ ANALYSIS PROCESS — follow these steps before producing JSON:
 RULES:
 - archetypes: 2 to 4 behavioral archetypes. Every interviewee must be represented in at least one archetype. Archetypes are defined by cross-cutting behavioral patterns, not individual portraits.
 - Each archetype label must be in French and evocative (article + noun + adjective)
-- empathy_map per archetype: each quadrant must contain 3-5 real verbatim quotes between double quotes — not paraphrases
+- empathy_persona per archetype: every field must be grounded in real verbatims — no generalisation, no invented content
+- empathy_persona.jtbd: must follow the exact format "Quand…, je veux…, pour…" — never reference the product being analysed by name
+- empathy_persona.preferences: 3 criteria formulated from the user's point of view, not from the product's marketing perspective
+- empathy_persona.emotions_positive: 2-3 entries, each with an emotion label and a real verbatim supporting it
+- empathy_persona.emotions_negative: 2-3 entries, each with an emotion label and a real verbatim supporting it
+- empathy_persona.hmw: exactly 2 "How Might We" questions, in French, oriented towards product opportunities
 - verbatims array: 2-3 striking direct quotes per archetype
 - jtbds: extract 3 to 8 jobs-to-be-done, each linked to one or more archetypes by their exact label
 - interviewee_count: exact count of interviewees in the corpus who share this job
