@@ -15,7 +15,7 @@ SCHEMA:
 {
   "archetypes": [
     {
-      "label": "string — a descriptive French label in plural form, lowercase except first letter (e.g. 'Les administratifs débordés', 'Les stratèges autonomes', 'Les perfectionnistes organisés')",
+      "label": "string — a short French label, 3 words max: plural article + noun + adjective, lowercase except first letter (e.g. 'Les administratifs débordés', 'Les stratèges autonomes', 'Les perfectionnistes organisés'). NEVER more than 3 words.",
       "behavioral_description": "string — 2-3 sentences describing behavioral patterns common to multiple interviewees, not a demographic portrait",
       "tech_relationship": "string — 1-2 sentences on how this archetype relates to and uses technology",
       "main_frustration": "string — the core recurring frustration, grounded in verbatims",
@@ -65,7 +65,7 @@ ANALYSIS PROCESS — follow these steps before producing JSON:
 
 RULES:
 - archetypes: 2 to 4 behavioral archetypes. Every interviewee must be represented in at least one archetype. Archetypes are defined by cross-cutting behavioral patterns, not individual portraits.
-- Each archetype label must be in French, plural, and evocative (plural article + plural noun + plural adjective, lowercase except first letter — e.g. "Les stratèges surchargés")
+- Each archetype label must be in French, plural, short, and evocative — MAXIMUM 3 words: plural article + noun + adjective, lowercase except first letter (e.g. "Les stratèges surchargés", "Les administratifs débordés"). NEVER use more than 3 words in a label.
 - ALL content fields must be written in French — labels, descriptions, verbatim summaries, everything except JSON keys
 - Plural mandatory: all archetype descriptions use "ils/elles" and the plural form. Never use "il", "elle", or an interviewee's name outside of verbatim quotes
 - empathy_persona per archetype: every field must be grounded in real verbatims — no generalisation, no invented content
